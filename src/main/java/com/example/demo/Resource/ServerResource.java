@@ -22,13 +22,18 @@ import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 @RestController
 @RequestMapping("/server")
+//necessary for dependency injection
 @RequiredArgsConstructor
 public class ServerResource {
+    // Injecting dependency of server service
     private final ServerServiceImplementation serverService;
 
+    // returns all servers in the response
     @GetMapping("/list")
     public ResponseEntity<Response> getServers() {
+        // ResponseEntity.ok(T body) generates successful response with body given as the parameter
         return ResponseEntity.ok((
+                // using builder pattern to create response body
                 Response.builder()
                         .timeStamp(LocalDateTime.now())
                         .data(Map.of("servers", serverService.list(30)))
@@ -40,6 +45,7 @@ public class ServerResource {
         );
     }
 
+    // used to simulate pinging servers. If the ping is unsuccessful returns response with Status.SERVER_DOWN
     @GetMapping("/ping/{ipAddress}")
     public ResponseEntity<Response> pingServer(@PathVariable("ipAddress") String ipAddress) throws IOException {
         Server server = serverService.ping(ipAddress);
@@ -55,7 +61,11 @@ public class ServerResource {
         );
     }
 
+    //POST HTTP request
     @PostMapping("/save")
+    // @Valid ensures that the field checks all the constraints specified in the class declaration.
+    // for example, we specified that the ipAddress should be unique in the table in the server class
+    // so if server given in the argument has the same ipAddress as a different record in the table then server cannot be saved
     public ResponseEntity<Response> saveServer(@RequestBody @Valid Server server) {
         return ResponseEntity.ok(
                 Response.builder()
@@ -99,7 +109,8 @@ public class ServerResource {
 
     @GetMapping(path = "/image/{fileName}", produces = IMAGE_PNG_VALUE)
     public byte[] getServerImage(@PathVariable("fileName") String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(System.getProperty("user.home")+ "/Downloads/images/" + fileName));
+        // reads images from the project folder in resources/images
+        return Files.readAllBytes(Paths.get(System.getProperty("user.dir")+ "/src/main/resources/images/" + fileName));
     }
 
 

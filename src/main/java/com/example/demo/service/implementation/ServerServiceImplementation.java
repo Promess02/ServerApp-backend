@@ -23,13 +23,19 @@ import static com.example.demo.enumeration.Status.SERVER_UP;
 //Lombok creates constructor and injects serverRepo - dependency injection
 @RequiredArgsConstructor
 @Service
+// all methods in a class are to be executed in a transactional context.
+//If any part of the transaction fails, all changes made during the transaction
+// are rolled back
 @Transactional
+// SLF4J - Simple logging facade for java - adds logging to the class
 @Slf4j
 public class ServerServiceImplementation implements ServerService {
 
+    //injecting repository
     private final ServerRepo serverRepo;
     @Override
     public Server create(Server server) {
+        //log from SLF4J
         log.info("Saving new server: {}", server.getName());
         server.setImageURL(setServerImageUrl());
         return serverRepo.save(server);
