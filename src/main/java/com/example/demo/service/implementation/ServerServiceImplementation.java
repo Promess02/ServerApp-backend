@@ -1,6 +1,5 @@
 package com.example.demo.service.implementation;
 
-import com.example.demo.enumeration.Status;
 import com.example.demo.model.Server;
 import com.example.demo.repo.ServerRepo;
 import com.example.demo.service.ServerService;
@@ -15,9 +14,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import static com.example.demo.enumeration.Status.*;
+import static com.example.demo.enumeration.Status.SERVER_DOWN;
 import static com.example.demo.enumeration.Status.SERVER_UP;
 
 //Lombok creates constructor and injects serverRepo - dependency injection
@@ -49,19 +47,20 @@ public class ServerServiceImplementation implements ServerService {
 
     @Override
     public Server get(Long id) {
-        log.info("Fetching server by id: ", id);
-        return serverRepo.findById(id).get();
+        log.info("Fetching server by id: " + id);
+        if(serverRepo.findById(id).isPresent()) return serverRepo.findById(id).get();
+        else throw new RuntimeException("server not found");
     }
 
     @Override
     public Server update(Server server) {
-        log.info("updating server: ", server.getName());
+        log.info("updating server: " + server.getName());
         return serverRepo.save(server);
     }
 
     @Override
     public Boolean delete(Long id) {
-        log.info("delete server with id: ", id);
+        log.info("delete server with id: " + id);
         serverRepo.deleteById(id);
 
         return true;
